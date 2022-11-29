@@ -36,6 +36,8 @@ class CheckboxPlusPrompt extends Base {
     this.opt.highlight = this.opt.highlight ?? false;
     this.opt.searchable = this.opt.searchable ?? false;
     this.opt.default = this.opt.default ?? null;
+    this.opt.minimumChoices = this.opt.minimumChoices ?? 0;
+    this.opt.maximumChoices = this.opt.maximumChoices ?? null;
 
     // Doesn't have source option
     if (!this.opt.source) {
@@ -54,8 +56,34 @@ class CheckboxPlusPrompt extends Base {
     this.default = this.opt.default;
     this.opt.default = null;
 
+    this.alterValidator();
+
     this.paginator = new Paginator(this.screen);
 
+  }
+
+  /**
+   * Take into account the minimumChoiches and maximumChoices options
+   */
+  alterValidator() {
+    const optValidator = this.opt.validate;
+    const self = this;
+
+    this.opt.validate = function(answer) {
+      if (self.opt.minimumChoices && answer.length < self.opt.minimumChoices) {
+        return `You have to check at least ${self.opt.minimumChoices} choice(s)`;
+      }
+
+      if (self.opt.maximumChoices && answer.length > self.opt.maximumChoices) {
+        return `You have to check at most ${self.opt.maximumChoices} choice(s)`;
+      }
+
+      if (optValidator) {
+        return optValidator(answer)
+      }
+      
+      return true;
+    }
   }
 
   /**

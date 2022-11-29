@@ -14,7 +14,8 @@ const colors = [
   {name: 'The blue color', value: 'blue', short: 'blue', disabled: true},
   {name: 'The green color', value: 'green', short: 'green', disabled: false},
   {name: 'The yellow color', value: 'yellow', short: 'yellow', disabled: false},
-  {name: 'The black color', value: 'black', short: 'black', disabled: false}
+  {name: 'The black color', value: 'black', short: 'black', disabled: false},
+  {name: 'The purple color', value: 'purple', short: 'purple', disabled: false}
 ];
 
 inquirer.prompt([{
@@ -25,10 +26,12 @@ inquirer.prompt([{
   highlight: true,
   searchable: true,
   default: ['yellow', 'red', {name: 'black'}],
+  minimumChoices: 1,
+  maximumChoices: 4,
   validate(answer) {
 
-    if (answer.length == 0) {
-      return 'You must choose at least one color.';
+    if (!answer.includes('red')) {
+      return 'You cannot abandon red!';
     }
 
     return true;
