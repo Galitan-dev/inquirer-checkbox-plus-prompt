@@ -6,15 +6,15 @@
 
 'use strict';
 
-var _ = require('lodash');
-var chalk = require('chalk');
-var { map, takeUntil } = require('rxjs/operators');
-var cliCursor = require('cli-cursor');
-var figures = require('figures');
-var Base = require('inquirer/lib/prompts/base');
-var Choices = require('inquirer/lib/objects/choices');
-var observe = require('inquirer/lib/utils/events');
-var Paginator = require('inquirer/lib/utils/paginator');
+const _ = require('lodash');
+const chalk = require('chalk');
+const { map, takeUntil } = require('rxjs/operators');
+const cliCursor = require('cli-cursor');
+const figures = require('figures');
+const Base = require('inquirer/lib/prompts/base');
+const Choices = require('inquirer/lib/objects/choices');
+const observe = require('inquirer/lib/utils/events');
+const Paginator = require('inquirer/lib/utils/paginator');
 
 /**
  * CheckboxPlusPrompt
@@ -32,20 +32,10 @@ class CheckboxPlusPrompt extends Base {
 
     super(questions, rl, answers);
 
-    // Default value for the highlight option
-    if (typeof this.opt.highlight == 'undefined') {
-      this.opt.highlight = false;
-    }
-
-    // Default value for the searchable option
-    if (typeof this.opt.searchable == 'undefined') {
-      this.opt.searchable = false;
-    }
-
-    // Default value for the default option
-    if (typeof this.opt.default == 'undefined') {
-      this.opt.default = null;
-    }
+    // Default values (could be removed)
+    this.opt.highlight = this.opt.highlight ?? false;
+    this.opt.searchable = this.opt.searchable ?? false;
+    this.opt.default = this.opt.default ?? null;
 
     // Doesn't have source option
     if (!this.opt.source) {
@@ -76,15 +66,15 @@ class CheckboxPlusPrompt extends Base {
    */
   _run(callback) {
 
-    var self = this;
+    const self = this;
 
     this.done = callback;
 
-    this.executeSource().then(function(result) {
+    this.executeSource().then(function() {
 
-      var events = observe(self.rl);
+      const events = observe(self.rl);
 
-      var validation = self.handleSubmitEvents(
+      const validation = self.handleSubmitEvents(
         events.line.pipe(map(self.getCurrentValue.bind(self)))
       );
       validation.success.forEach(self.onEnd.bind(self));
@@ -141,8 +131,8 @@ class CheckboxPlusPrompt extends Base {
    */
   executeSource() {
 
-    var self = this;
-    var sourcePromise = null;
+    const self = this;
+    let sourcePromise = null;
 
     // Remove spaces
     this.rl.line = _.trim(this.rl.line);
@@ -180,11 +170,7 @@ class CheckboxPlusPrompt extends Base {
       self.choices.forEach(function(choice) {
 
         // Is the current choice included in the current checked choices
-        if (_.findIndex(self.value, _.isEqual.bind(null, choice.value)) != -1) {
-          self.toggleChoice(choice, true);
-        } else {
-          self.toggleChoice(choice, false);
-        }
+        self.toggleChoice(choice, _.some(self.value, _.isEqual.bind(null, choice.value)));
 
         // The default is not applied yet
         if (self.default) {
@@ -219,8 +205,8 @@ class CheckboxPlusPrompt extends Base {
   render(error) {
 
     // Render question
-    var message = this.getQuestion();
-    var bottomContent = '';
+    let message = this.getQuestion();
+    let bottomContent = '';
 
     // Answered
     if (this.status === 'answered') {
@@ -343,7 +329,7 @@ class CheckboxPlusPrompt extends Base {
    */
   onUpKey() {
 
-    var len = this.choices.realLength;
+    const len = this.choices.realLength;
     this.pointer = this.pointer > 0 ? this.pointer - 1 : len - 1;
     this.render();
 
@@ -355,7 +341,7 @@ class CheckboxPlusPrompt extends Base {
    */
   onDownKey() {
 
-    var len = this.choices.realLength;
+    const len = this.choices.realLength;
     this.pointer = this.pointer < len - 1 ? this.pointer + 1 : 0;
     this.render();
 
@@ -398,7 +384,7 @@ class CheckboxPlusPrompt extends Base {
    */
   onAllKey() {
 
-    var shouldBeChecked = Boolean(
+    const shouldBeChecked = Boolean(
       this.choices.find(function(choice) {
         return choice.type !== 'separator' && !choice.checked;
       })
@@ -447,28 +433,20 @@ class CheckboxPlusPrompt extends Base {
    * @param {Boolean} checked if not specified the status will be toggled
    * @param {Object}  choice
    */
-  toggleChoice(choice, checked) {
-
-    // Default value for checked
-    if (typeof checked === 'undefined') {
-      checked = !choice.checked;
-    }
+  toggleChoice(choice, checked = !choice.checked) {
 
     // Remove the choice's value from the checked values
     _.remove(this.value, _.isEqual.bind(null, choice.value));
 
     // Remove the checkedChoices with the value of the current choice
-    _.remove(this.checkedChoices, function(checkedChoice) {
-      return _.isEqual(choice.value, checkedChoice.value);
-    });
+    _.remove(this.checkedChoices, _.isEqual.bind(null, choice.value));
 
-    choice.checked = false;
+    choice.checked = checked;
 
     // Is the choice checked
     if (checked) {
       this.value.push(choice.value);
       this.checkedChoices.push(choice);
-      choice.checked = true;
     }
 
   }
@@ -494,9 +472,9 @@ class CheckboxPlusPrompt extends Base {
    */
   renderChoices(choices, pointer) {
 
-    var self = this;
-    var output = '';
-    var separatorOffset = 0;
+    const self = this;
+    let output = '';
+    let separatorOffset = 0;
 
     // Foreach choice
     choices.forEach(function(choice, index) {
@@ -527,15 +505,12 @@ class CheckboxPlusPrompt extends Base {
         output += chalk.cyan(figures.pointer);
         output += self.getCheckboxFigure(choice.checked) + ' ';
         output += self.opt.highlight ? chalk.gray(choice.name) : choice.name;
-
-      } else {
-
-        output += ' ' + self.getCheckboxFigure(choice.checked) + ' ' + choice.name;
+        output += '\n';
+        return;
 
       }
 
-      output += '\n';
-
+      output += ' ' + self.getCheckboxFigure(choice.checked) + ' ' + choice.name + '\n';
 
     });
 

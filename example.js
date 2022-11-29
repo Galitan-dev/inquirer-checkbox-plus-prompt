@@ -4,12 +4,12 @@
  * @author Mohammad Fares <faressoft.com@gmail.com>
  */
 
-var inquirer = require('inquirer');
-var fuzzy = require('fuzzy');
+const inquirer = require('inquirer');
+const fuzzy = require('fuzzy');
 
 inquirer.registerPrompt('checkbox-plus', require('./index'));
 
-var colors = [
+const colors = [
   {name: 'The red color', value: 'red', short: 'red', disabled: false},
   {name: 'The blue color', value: 'blue', short: 'blue', disabled: true},
   {name: 'The green color', value: 'green', short: 'green', disabled: false},
@@ -25,7 +25,7 @@ inquirer.prompt([{
   highlight: true,
   searchable: true,
   default: ['yellow', 'red', {name: 'black'}],
-  validate: function(answer) {
+  validate(answer) {
 
     if (answer.length == 0) {
       return 'You must choose at least one color.';
@@ -34,19 +34,17 @@ inquirer.prompt([{
     return true;
 
   },
-  source: function(answersSoFar, input) {
-
-    input = input || '';
+  source(_, input = '') {
 
     return new Promise(function(resolve) {
 
-      var fuzzyResult = fuzzy.filter(input, colors, {
-        extract: function(item) {
+      const fuzzyResult = fuzzy.filter(input, colors, {
+        extract(item) {
           return item['name'];
         }
       });
 
-      var data = fuzzyResult.map(function(element) {
+      const data = fuzzyResult.map(function(element) {
         return element.original;
       });
 
