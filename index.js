@@ -439,7 +439,9 @@ class CheckboxPlusPrompt extends Base {
     _.remove(this.value, _.isEqual.bind(null, choice.value));
 
     // Remove the checkedChoices with the value of the current choice
-    _.remove(this.checkedChoices, _.isEqual.bind(null, choice.value));
+    _.remove(this.checkedChoices, function(checkedChoice) {
+      return _.isEqual(choice.value, checkedChoice.value);
+    });
 
     choice.checked = checked;
 
