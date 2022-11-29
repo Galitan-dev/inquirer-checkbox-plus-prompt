@@ -27,14 +27,10 @@ inquirer.prompt([{
   searchable: true,
   default: ['yellow', 'red', {name: 'black'}],
   minimumChoices: 1,
-  maximumChoices: 4,
+  maximumChoices: [4, "C'mon, you cannot choose every colors! Make a choice!"],
   validate(answer) {
 
-    if (!answer.includes('red')) {
-      return 'You cannot abandon red!';
-    }
-
-    return true;
+    return answer.includes('red') || 'You cannot abandon red!';
 
   },
   source(_, input = '') {

@@ -63,19 +63,40 @@ class CheckboxPlusPrompt extends Base {
   }
 
   /**
+   * Apply a default message to a criteria
+   * @param {undefined|number|[number, string]} criteria 
+   * @param {(criteria)=>string} defaultMessage 
+   * @returns {[number, string]} criteria 
+   */
+  decomposeCriteria(criteria, defaultMessage) {
+    if (Array.isArray(criteria)) return criteria;
+
+    return [criteria, defaultMessage(criteria)]
+  }
+
+  /**
    * Take into account the minimumChoiches and maximumChoices options
    */
   alterValidator() {
     const optValidator = this.opt.validate;
-    const self = this;
+    
+    const [min, minMessage] = this.decomposeCriteria(this.opt.minimumChoices, function(min) {
+      return `You have to check at least ${min} choice(s)`
+    });
+
+    const [max, maxMessage] = this.decomposeCriteria(this.opt.maximumChoices, function(min) {
+      return `You have to check at least ${min} choice(s)`
+    });
+
+    console.log(max)
 
     this.opt.validate = function(answer) {
-      if (self.opt.minimumChoices && answer.length < self.opt.minimumChoices) {
-        return `You have to check at least ${self.opt.minimumChoices} choice(s)`;
+      if (min && answer.length < min) {
+        return minMessage;
       }
 
-      if (self.opt.maximumChoices && answer.length > self.opt.maximumChoices) {
-        return `You have to check at most ${self.opt.maximumChoices} choice(s)`;
+      if (max && answer.length > max) {
+        return maxMessage;
       }
 
       if (optValidator) {
