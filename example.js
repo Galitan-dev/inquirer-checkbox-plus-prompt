@@ -24,7 +24,6 @@ inquirer.prompt([{
   message: 'Enter colors',
   pageSize: 10,
   highlight: true,
-  searchable: true,
   default: ['yellow', 'red', {name: 'black'}],
   minimumChoices: 1,
   maximumChoices: [4, "C'mon, you cannot choose every colors! Make a choice!"],
@@ -33,6 +32,9 @@ inquirer.prompt([{
     return answer.includes('red') || 'You cannot abandon red!';
 
   },
+  // searchable: false,
+  // source: colors,
+  searchable: true,
   source(_, input = '') {
 
     return new Promise(function(resolve) {

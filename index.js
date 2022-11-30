@@ -191,9 +191,15 @@ class CheckboxPlusPrompt extends Base {
 
     // If the search is enabled
     if (this.opt.searchable) {
+      if (typeof this.opt.source !== "function") {
+        throw new Error("To be searchable, the source must be a function returing a promise")
+      }
+
       sourcePromise = this.opt.source(this.answers, this.rl.line);
-    } else {
+    } else if (typeof this.opt.source === 'function') {
       sourcePromise = this.opt.source(this.answers, null);
+    } else {
+      sourcePromise = Promise.resolve(this.opt.source);
     }
 
     this.lastQuery = this.rl.line;
