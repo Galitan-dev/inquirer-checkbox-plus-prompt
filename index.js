@@ -88,8 +88,6 @@ class CheckboxPlusPrompt extends Base {
       return `You have to check at least ${min} choice(s)`
     });
 
-    console.log(max)
-
     this.opt.validate = function(answer) {
       if (min && answer.length < min) {
         return minMessage;
